@@ -39,18 +39,18 @@ function resolve(val: string): { encoded: string; res: ReservationData } | null 
   return r ? { encoded: v, res: r } : null
 }
 
-// Lookup in /reservations.json for admin-created reservations
+// Lookup in database via API
 async function resolveRemote(val: string): Promise<{ encoded: string; res: ReservationData } | null> {
   const upper = val.trim().toUpperCase()
   if (!upper.startsWith("MAYA-")) return null
   try {
-    const res = await fetch(`/reservations.json?t=${Date.now()}`, { cache: "no-store" })
+    const res = await fetch(`/api/reservas?code=${encodeURIComponent(upper)}`, { cache: "no-store" })
     if (!res.ok) return null
-    const db: Record<string, string> = await res.json()
-    const encoded = db[upper]
-    if (!encoded) return null
-    const data = decodeClient(encoded)
-    return data ? { encoded, res: data } : null
+    const data: ReservationData = await res.json()
+    // Re-encode for QR / confirmation URL
+    const { encodeReservation } = await import("@/lib/reservation")
+    const encoded = encodeReservation(data)
+    return { encoded, res: data }
   } catch { return null }
 }
 

@@ -90,6 +90,15 @@ export function formatDateEs(dateStr: string): string {
   })
 }
 
+// Client-side encode — uses browser TextEncoder
+export function encodeReservation(data: ReservationData): string {
+  const json = JSON.stringify(data)
+  const bytes = new TextEncoder().encode(json)
+  let binary = ""
+  bytes.forEach((b) => (binary += String.fromCharCode(b)))
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")
+}
+
 // Server-side decode — uses Node.js Buffer
 export function decodeReservation(encoded: string): ReservationData | null {
   try {

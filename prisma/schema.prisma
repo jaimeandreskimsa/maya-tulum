@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Reservation {
+  id              Int      @id @default(autoincrement())
+  code            String   @unique
+  guest           String
+  email           String
+  phone           String
+  passport        String
+  nationality     String
+  checkin         String
+  checkout        String
+  nights          Int
+  roomId          String
+  roomName        String
+  guests          Int
+  ratePerNight    Float
+  subtotal        Float
+  tax             Float
+  total           Float
+  specialRequests String   @default("")
+  createdAt       String
+}

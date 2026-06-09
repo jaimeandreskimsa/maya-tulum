@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import Link from "next/link"
-import { ROOMS, type ReservationData } from "@/lib/reservation"
+import { ROOMS, type ReservationData, encodeReservation } from "@/lib/reservation"
 import { ArrowLeft, ChevronDown } from "lucide-react"
 
 function generateCode(): string {
@@ -14,15 +14,6 @@ function generateCode(): string {
     code += chars[Math.floor(Math.random() * chars.length)]
   }
   return code
-}
-
-function encodeReservation(data: ReservationData): string {
-  const json = JSON.stringify(data)
-  // Unicode-safe base64
-  const bytes = new TextEncoder().encode(json)
-  let binary = ""
-  bytes.forEach((b) => (binary += String.fromCharCode(b)))
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")
 }
 
 function calcNights(checkin: string, checkout: string): number {
@@ -123,6 +114,17 @@ function BookingForm() {
       if (!index.includes(data.code)) index.push(data.code)
       localStorage.setItem("res_index", JSON.stringify(index))
     } catch { /* storage unavailable */ }
+
+    // Save to database (non-blocking)
+    try {
+      await fetch("/api/reservas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+    } catch {
+      console.warn("No se pudo guardar en DB, continuando...")
+    }
 
     // Send confirmation email (non-blocking — redirect regardless of result)
     try {
