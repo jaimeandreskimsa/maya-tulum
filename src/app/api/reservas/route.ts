@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/db"
+import { getPrisma } from "@/lib/db"
 import type { ReservationData } from "@/lib/reservation"
 
 // POST /api/reservas — guardar reserva
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Datos incompletos" }, { status: 400 })
     }
 
-    const reservation = await prisma.reservation.upsert({
+    const reservation = await getPrisma().reservation.upsert({
       where: { code: data.code },
       update: {},
       create: {
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Código requerido" }, { status: 400 })
     }
 
-    const reservation = await prisma.reservation.findUnique({
+    const reservation = await getPrisma().reservation.findUnique({
       where: { code: code.toUpperCase() },
     })
 
