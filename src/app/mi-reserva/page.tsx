@@ -181,21 +181,25 @@ function MiReservaContent() {
       return
     }
 
-    // 1. Try local resolve (URL / localStorage / raw base64)
+    // Para códigos MAYA-, siempre consultar la BD (datos siempre frescos)
+    if (input.trim().toUpperCase().startsWith("MAYA-")) {
+      setLoading(true)
+      const remote = await resolveRemote(input.trim())
+      setLoading(false)
+      if (remote) {
+        saveToStorage(remote.res, remote.encoded)
+        setValidated(remote)
+        return
+      }
+      setError("No se encontró la reserva. Verifica que el código sea correcto.")
+      return
+    }
+
+    // Para URLs y base64, resolver localmente
     const found = resolve(input)
     if (found) {
       saveToStorage(found.res, found.encoded)
       setValidated(found)
-      return
-    }
-
-    // 2. Try remote lookup (admin-created reservations)
-    setLoading(true)
-    const remote = await resolveRemote(input)
-    setLoading(false)
-    if (remote) {
-      saveToStorage(remote.res, remote.encoded)
-      setValidated(remote)
       return
     }
 
