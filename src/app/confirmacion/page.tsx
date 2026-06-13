@@ -3,6 +3,7 @@ import Link from "next/link"
 import { CheckCircle, ArrowLeft } from "lucide-react"
 import PrintButton from "./print-button"
 import { headers } from "next/headers"
+import { prisma } from "@/lib/db"
 
 function formatCurrency(n: number): string {
   return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -32,7 +33,15 @@ export default async function ConfirmacionPage({
     )
   }
 
-  const res = decodeReservation(d)
+  let res = decodeReservation(d)
+
+  // Si el código está disponible, refresca desde la BD para tener datos siempre actualizados
+  if (res?.code) {
+    try {
+      const fresh = await prisma.reservation.findUnique({ where: { code: res.code } })
+      if (fresh) res = fresh as typeof res
+    } catch { /* si falla la BD, usa los datos del URL */ }
+  }
 
   if (!res) {
     return (
