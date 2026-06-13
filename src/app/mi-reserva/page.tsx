@@ -100,6 +100,7 @@ function ValidationCard({
               ["Huésped",      res.guest],
               ["Pasaporte",    res.passport],
               ["Nacionalidad", res.nationality],
+              ["Teléfono",     res.phone],
               ["Llegada",      `${formatDate(res.checkin)} · 15:00 h`],
               ["Salida",       `${formatDate(res.checkout)} · 12:00 h`],
               ["Habitación",   res.roomName],
