@@ -150,6 +150,7 @@ function MiReservaContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const dParam = searchParams.get("d")
+  const codeParam = searchParams.get("code")
 
   const [input, setInput] = useState("")
   const [error, setError] = useState("")
@@ -158,6 +159,17 @@ function MiReservaContent() {
   useEffect(() => {
     if (dParam) router.replace(`/confirmacion?d=${dParam}`)
   }, [dParam, router])
+
+  // Auto-buscar cuando llega ?code=MAYA-XXXX (link del correo de confirmación)
+  useEffect(() => {
+    if (!codeParam) return
+    resolveRemote(codeParam).then((remote) => {
+      if (remote) {
+        saveToStorage(remote.res, remote.encoded)
+        router.replace(`/confirmacion?d=${remote.encoded}`)
+      }
+    })
+  }, [codeParam, router])
 
   const [loading, setLoading] = useState(false)
 
@@ -190,7 +202,7 @@ function MiReservaContent() {
     setError("No se encontró la reserva. Verifica que el código o enlace sea correcto.")
   }
 
-  if (dParam) return (
+  if (dParam || codeParam) return (
     <div className="min-h-screen bg-[#f9f5ee] flex items-center justify-center">
       <p className="text-gray-400 font-sans">Cargando reserva...</p>
     </div>
@@ -230,7 +242,7 @@ function MiReservaContent() {
                     className="w-full border border-gray-200 px-4 py-3 text-sm font-sans text-gray-800 focus:outline-none focus:border-[#1e3a1e] bg-white placeholder:text-gray-400 transition-colors resize-none"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="MAYA-AB3K9F  ó  https://hotel-maya-tulum.vercel.app/confirmacion?d=..."
+                    placeholder="MAYA-AB3K9F  ó  https://app.hotelmayatulum.com/confirmacion?d=..."
                     autoComplete="off"
                     spellCheck={false}
                   />
