@@ -75,21 +75,6 @@ function formatDate(dateStr: string): string {
 function ValidationCard({
   res, encoded, onReset,
 }: { res: ReservationData; encoded: string; onReset: () => void }) {
-  const [qrSrc, setQrSrc] = useState("")
-  const confirmUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/confirmacion?d=${encoded}` : ""
-
-  useEffect(() => {
-    if (!confirmUrl) return
-    import("qrcode").then((QR) =>
-      QR.toDataURL(confirmUrl, {
-        width: 200, margin: 1,
-        color: { dark: "#1e3a1e", light: "#ffffff" },
-        errorCorrectionLevel: "M",
-      }).then(setQrSrc).catch(() => {})
-    )
-  }, [confirmUrl])
-
   return (
     <div className="bg-white shadow-sm overflow-hidden">
       {/* Status bar */}
@@ -106,60 +91,34 @@ function ValidationCard({
       </div>
 
       <div className="p-6 md:p-8">
-        <div className="grid md:grid-cols-2 gap-8 items-start">
-          {/* Summary */}
-          <div>
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#b8962e] font-sans mb-4">
-              Datos de la reserva
-            </p>
-            <table className="w-full text-sm font-sans">
-              <tbody>
-                {([
-                  ["Huésped",      res.guest],
-                  ["Pasaporte",    res.passport],
-                  ["Nacionalidad", res.nationality],
-                  ["Llegada",      `${formatDate(res.checkin)} · 15:00 h`],
-                  ["Salida",       `${formatDate(res.checkout)} · 12:00 h`],
-                  ["Habitación",   res.roomName],
-                  ["Huéspedes",    `${res.guests} ${res.guests === 1 ? "persona" : "personas"}`],
-                ] as [string, string][]).map(([label, value]) => (
-                  <tr key={label} className="border-b border-gray-50">
-                    <td className="py-2 pr-3 text-gray-400 w-[38%] align-top">{label}</td>
-                    <td className="py-2 text-gray-800 font-medium">{value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="mt-5 pt-4 border-t border-gray-100">
-              <p className="text-xs text-gray-500 font-sans leading-relaxed">
-                <strong className="text-[#1e3a1e] block mb-0.5">Hotel Maya-Tulum</strong>
-                Carretera Tulum-Cobá Km 7.5, Zona Hotelera<br />
-                Tulum, Quintana Roo 77780, México<br />
-                +52 (984) 877-3210
-              </p>
-            </div>
-          </div>
-
-          {/* QR */}
-          <div className="flex flex-col items-center">
-            <p className="text-[10px] tracking-[0.4em] uppercase text-[#b8962e] font-sans mb-4 self-start md:self-center">
-              QR de verificación
-            </p>
-            <div className="border-2 border-[#1e3a1e]/15 p-3 bg-white inline-block mb-3">
-              {qrSrc ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={qrSrc} alt={`QR ${res.code}`} width={200} height={200} />
-              ) : (
-                <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-50">
-                  <div className="w-6 h-6 border-2 border-[#1e3a1e] border-t-transparent rounded-full animate-spin" />
-                </div>
-              )}
-            </div>
-            <p className="text-[10px] text-gray-400 font-sans text-center leading-relaxed">
-              Escanea para abrir<br />el comprobante oficial
-            </p>
-            <p className="text-[9px] text-gray-300 font-mono mt-1">{res.code}</p>
-          </div>
+        <p className="text-[10px] tracking-[0.4em] uppercase text-[#b8962e] font-sans mb-4">
+          Datos de la reserva
+        </p>
+        <table className="w-full text-sm font-sans">
+          <tbody>
+            {([
+              ["Huésped",      res.guest],
+              ["Pasaporte",    res.passport],
+              ["Nacionalidad", res.nationality],
+              ["Llegada",      `${formatDate(res.checkin)} · 15:00 h`],
+              ["Salida",       `${formatDate(res.checkout)} · 12:00 h`],
+              ["Habitación",   res.roomName],
+              ["Huéspedes",    `${res.guests} ${res.guests === 1 ? "persona" : "personas"}`],
+            ] as [string, string][]).map(([label, value]) => (
+              <tr key={label} className="border-b border-gray-50">
+                <td className="py-2 pr-3 text-gray-400 w-[38%] align-top">{label}</td>
+                <td className="py-2 text-gray-800 font-medium">{value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="mt-5 pt-4 border-t border-gray-100">
+          <p className="text-xs text-gray-500 font-sans leading-relaxed">
+            <strong className="text-[#1e3a1e] block mb-0.5">Hotel Maya-Tulum</strong>
+            Carretera Tulum-Cobá Km 7.5, Zona Hotelera<br />
+            Tulum, Quintana Roo 77780, México<br />
+            +52 (984) 877-3210
+          </p>
         </div>
       </div>
 

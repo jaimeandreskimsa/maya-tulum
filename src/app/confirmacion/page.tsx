@@ -2,7 +2,6 @@ import { decodeReservation, formatDateEs } from "@/lib/reservation"
 import Link from "next/link"
 import { CheckCircle, ArrowLeft } from "lucide-react"
 import PrintButton from "./print-button"
-import QRCode from "qrcode"
 import { headers } from "next/headers"
 
 function formatCurrency(n: number): string {
@@ -34,19 +33,6 @@ export default async function ConfirmacionPage({
   }
 
   const res = decodeReservation(d)
-
-  // Generate real scannable QR code of the confirmation URL
-  let qrDataUrl = ""
-  try {
-    qrDataUrl = await QRCode.toDataURL(confirmUrl, {
-      width: 140,
-      margin: 1,
-      color: { dark: "#1e3a1e", light: "#ffffff" },
-      errorCorrectionLevel: "M",
-    })
-  } catch {
-    qrDataUrl = ""
-  }
 
   if (!res) {
     return (
@@ -289,28 +275,6 @@ export default async function ConfirmacionPage({
                 Tel: +52 (984) 877-3210<br />
                 reservaciones@hotelmayatulum.mx
               </p>
-            </div>
-            {/* QR real escaneable — abre el voucher completo */}
-            <div className="flex justify-end">
-              <div className="text-center">
-                {qrDataUrl ? (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={qrDataUrl}
-                      alt={`QR de reserva ${res.code}`}
-                      width={100}
-                      height={100}
-                      className="border border-[#1e3a1e]/20"
-                    />
-                    <p className="text-[9px] text-gray-400 font-sans mt-1 tracking-wider">
-                      Escanea para ver reserva
-                    </p>
-                  </>
-                ) : (
-                  <p className="text-[9px] text-gray-400 font-sans">{res.code}</p>
-                )}
-              </div>
             </div>
           </div>
         </div>
